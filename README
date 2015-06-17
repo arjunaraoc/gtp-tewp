@@ -1,0 +1,29 @@
+Google Translation  Project - Telugu Wikipedia data analysis
+
+This project contains all the files required. This uses the ProjectTemplate package
+for organising the files.
+
+
+To load this  project, you'll first need to `setwd()` into the directory
+where this README file is located. Then you need to run the following two
+lines of R code:
+
+	library('ProjectTemplate')
+	load.project()
+
+After you enter the second line of code, you'll see a series of automated
+messages as ProjectTemplate goes about doing its work. This work involves:
+* Reading in the global configuration file contained in `config`.
+* Loading any R packages you listed in he configuration file.
+* Reading in any datasets stored in `data` or `cache`.
+* Preprocessing your data using the files in the `munge` directory.
+
+You'll have access to all of your data, already fully preprocessed, and
+all of the libraries you want to use.
+
+Once that's done, you can execute any code you'd like by loading the relevant 
+scripts. 
+
+For the analysis already done, browse the relevant pdf files produced from Rmd files.
+
+For more details about ProjectTemplate, see http://projecttemplate.net

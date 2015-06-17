@@ -1,0 +1,87 @@
+---
+title: "Impact of Google Translation Project on Telugu Wikipedia"
+author: "Arjuna Rao C"
+date: "June 17, 2015"
+output: html_document
+---
+##Raw data and preprocessing
+Raw data for this project comes from the following sources.
+###Wikipedia Editing statistics
+* https://stats.wikimedia.org/EN/TablesWikipediaTE.htm
+From this, extract the table Monthly counts & Quarterly rankings: May 2015 into a spreadsheet. Delete the quarterly portion, update the column headings to incorporate the details from the heading rows
+###Wikipedia page view information
+
+### Page requests for specific pages
+* http://stat.grok.se gives pageviews for a specifc month
+* Make use of script updatepvdata.R to obtain pageviews for a set of articles in a month.
+* This requires a file, with one article title per line (spaces replaced with underscore) as input and gives the total page_requests and the month specification. for details see the script
+
+### Identifying Google Translation Project pages
+Google Translate updates are marked by a field like the follwing in the comment field. Sometimes the updates could be done anonymously and sometimes the % translation also could be missing. Some translations may have been done by volunteer wikimedians to experiment with Google Translate tool. Sometimes, Google contributors have overwritten pages already existing, without checking.
+
+So to ascertain  the number of articles contributed by  GTP, the following procedure is used.
+
+Obtain the list of articles with the revision comment containing 'toolkit': 1991 (as on 3 May 2015, Quarry link http://quarry.wmflabs.org/query/3579)
+
+### Identifying Featured article pages
+The talk pages of featured articles are gathered into a category called  "ఈ_వారం_వ్యాసాల_చర్చలు_-_%". Use this information to get the list of articles and their featured year, week information.
+http://quarry.wmflabs.org/query/3556
+
+### Page requests for the entire wiki
+https://stats.wikimedia.org/EN_India/TablesPageViewsMonthlyMobile.htm
+Specifically do the following for non mobile normalized views and mobile normalized views.
+As the html page is populated by a script, the information is difficult to extract directly. Copy paste  page requests table to a spreadsheet and take out the column corresponding to Telugu language. Then extract the relevant number.
+
+Then combine the page requests information into a common data frame. Alternately combined normalised page requests information can be  obtained similarly and used when analysing the total page views.
+
+
+## Data processing
+### code samples
+### for gtp language wikipedia plots.
+```{r, cache=TRUE}
+library(ggplot2)
+gtplang<-read.csv("data/gtplang.wsv",header=TRUE,sep="\t")
+g<-ggplot(gtplang,aes(Wikipedia,GTP.articles,fill=Wikipedia))+geom_bar(stat="identity")+geom_text(label=paste(gtplang$Wikipedia,gtplang$GTP.articles,sep="\n"),vjust=c(rep(1.1,4),-0.5))+labs(x=" ",y="Number of articles",title="Google Translation Project in Indian language wikipedias")+  scale_colour_manual(values=cbPalette)+theme(legend.position="none",axis.text.x=element_blank())
+g
+```
+###Key Editing statistics 
+```{r, cache=TRUE}
+library(ggplot2)
+library(reshape2)
+source("src/convert wiki stats to numbers.R")
+ws<-prepwstats()
+mindex<-c(as.Date("2007-06-15"),as.Date("2008-06-15"),as.Date("2009-06-15"),as.Date("2010-06-15"),as.Date("2011-06-15"),as.Date("2012-06-15"))
+cindex<-c("month","wikipedians_tot","art_count_official_k","art_mean_bytes","db_size_MB","db_size_words_M","links_int_k")
+wsgtp<-ws[ws$month %in% mindex,cindex]
+print(wsgtp)
+source("src/pctcompute.R")
+wspct<-as.data.frame(pctcompute(wsgtp))
+wspct$month<-wsgtp$month
+wspct<-wspct[-dim(wsgtp)[1],]
+wspctm<-melt(wspct,id.vars="month")
+g<-ggplot(wspctm,aes(as.factor(strftime(month,"%Y/%m")),value,group=variable))+geom_line(aes(color=variable))+labs(x="Year/month",y="% yearly change",title="Telugu Wikipedia-Key parameters percentage change \n Impact of Google Translation Project")
+g<-g+geom_vline(xintercept=2,color="black",linetype="longdash")+geom_vline(xintercept=4,color="black",linetype="longdash")
+g
+```
+
+###Page views 
+```{r, cache=TRUE}
+source("src/tepvplot.R")
+g<-plot_gtp_pr()
+g
+```
+
+###Popularity
+```{r, cache=TRUE}
+#GTP page requests total
+gtppr201403<-read.csv("data/gtppr201403.wsv",header=TRUE,sep=" ")
+sum(gtppr201403$page_requests)
+#non GTP featured article page requests total
+falpr201403<-read.csv("data/falpr201403.wsv",header=TRUE,sep=" ")
+sum(falpr201403$page_requests)
+```
+
+##References
+1)stat.grok.se for page requests in any given month for an article
+2)http:quarry.wmflabs.org for an easy to use and share query interface for wikipedia
+3)http://stats.wikimedia.org for wikipedia editing statistics
