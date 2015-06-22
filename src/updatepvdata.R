@@ -9,6 +9,7 @@
 ##start getting for all anames,else look for the last article for which 
 ## data is present and then get data for remaining articles
 ##2015-05-13 add error handling
+##example usage: updatepvdata("te","src title file with page_title header and names unquoted","201403","pv file name")
 updatepvdata<-function(prj,ptfile,ym,pvfile) {
     library(RCurl)
     library(jsonlite)
@@ -70,8 +71,8 @@ getURIs =
         
         if(.perform) {
             complete(multiHandle)
-            lapply(content, function(x) x$value())
-            ## lapply(content, function(x) {fromJSON(x$value(),flatten=TRUE)})
+            ##lapply(content, function(x) x$value())
+            lapply(content, function(x) {fromJSON(x$value(),flatten=TRUE)})
         } else {
             cat("Errors occured, returning raw content")
             return(list(multiHandle = multiHandle, content = content))
