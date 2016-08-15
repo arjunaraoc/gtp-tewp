@@ -13,7 +13,7 @@ g<-ggplot(tpv,aes(month,allnprM  )) +
     geom_smooth(se=T)+
     geom_vline(aes(xintercept=as.numeric(as.Date("2009-07-01"))),linetype=4, colour="red")+
     geom_vline(aes(xintercept=as.numeric(as.Date("2011-06-30"))),linetype=4, colour="red")+    
-    scale_x_date(labels = date_format("%Y/%m"),breaks="6 month")+
+    scale_x_date(labels = date_format("%Y/%m"),date_breaks="6 month")+
     labs(y="Page requests (in Millions)",x="Year/month",title="Telugu Wikipedia page requests")
 g
 }
